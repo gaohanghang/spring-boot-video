@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
+import project.util.FfmpegDevideVideo;
+import project.util.FileUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,15 +28,21 @@ public class SectionController {
     private String fileSavePath;
 
     @RequestMapping("/section")
-    public void section(HttpServletRequest request, HttpServletResponse response) {
+    public void section(String filePath, HttpServletRequest request, HttpServletResponse response) {
         logger.info("section...");
         //1.创建文件对象
-        File file = new File(this.getClass().getClassLoader().getResource("").getPath() + "static/video/1.mp4");
-        if (!file.exists()) {
-            logger.error("文件不存在!");
-            return;
-        }
-        String filePath = file.getAbsolutePath();
+        //File file = new File(this.getClass().getClassLoader().getResource("").getPath() + "static/video/1.mp4");
+        //File file = new File("/Users/gaohanghang/MUDR-109   .mp4/MUDR-109   .mp4");
+        //if (!file.exists()) {
+        //    logger.error("文件不存在!");
+        //    return;
+        //}
+
+        //String filePath = file.getAbsolutePath();
+        fileSavePath = filePath.substring(0, filePath.lastIndexOf("/") + 1) + fileSavePath;
+
+        FileUtil.createDirectories(fileSavePath);
+
         List<String> commands = new ArrayList<>();
         commands.add("ffmpeg");
         commands.add("-i");
@@ -47,8 +56,8 @@ public class SectionController {
         commands.add("-segment_list");
         commands.add(fileSavePath + "/playlist.m3u8");
         commands.add("-segment_time");
-        commands.add("5");
-        commands.add(fileSavePath + "/abc%03d.ts");
+        commands.add("140");
+        commands.add(fileSavePath + "/abc%03d.MP4");
 
         ProcessBuilder builder = new ProcessBuilder(commands);
         builder.redirectErrorStream(true);
