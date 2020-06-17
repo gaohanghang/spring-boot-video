@@ -87,37 +87,38 @@ public class VideoFileOperate {
         // 剪切的视频路径
         List<String> cutedVideoPaths = new ArrayList<String>();
 
-            int partNum = (int) (videoSecond / second);//文件大小除以分块大小的商
-            long remainSize = videoSecond % second;//余数
-            int cutNum;
-            if (remainSize > 0) {
-                cutNum = partNum + 1;
-            } else {
-                cutNum = partNum;
+        int partNum = (int) (videoSecond / second);//文件大小除以分块大小的商
+        long remainSize = videoSecond % second;//余数
+        int cutNum;
+        if (remainSize > 0) {
+            cutNum = partNum + 1;
+        } else {
+            cutNum = partNum;
+        }
+        int eachPartTime = second;
+        List<String> commands = new ArrayList<String>();
+        String fileFolder = file.getParentFile().getAbsolutePath();
+        String fileName[] = file.getName().split("\\.");
+        commands.add("ffmpeg");
+        for (int i = 0; i < cutNum; i++) {
+            commands.add("-i");
+            commands.add(filePath);
+            commands.add("-ss");
+            commands.add(String.valueOf(eachPartTime * i));
+            if (i != cutNum - 1) {
+                commands.add("-t");
+                commands.add(String.valueOf(eachPartTime));
             }
-            int eachPartTime = videoSecond / cutNum;
-            List<String> commands = new ArrayList<String>();
-            String fileFolder = file.getParentFile().getAbsolutePath();
-            String fileName[] = file.getName().split("\\.");
-            commands.add("ffmpeg");
-            for (int i = 0; i < cutNum; i++) {
-                commands.add("-i");
-                commands.add(filePath);
-                commands.add("-ss");
-                commands.add(parseTimeToString(eachPartTime * i));
-                if (i != cutNum - 1) {
-                    commands.add("-t");
-                    commands.add(parseTimeToString(eachPartTime));
-                }
-                commands.add("-acodec");
-                commands.add("copy");
-                commands.add("-vcodec");
-                commands.add("copy");
-                commands.add(fileFolder + File.separator + fileName[0] + "_part" + i + "." + fileName[1]);
-                commands.add("-y");
-                cutedVideoPaths.add(fileFolder + File.separator + fileName[0] + "_part" + i + "." + fileName[1]);
-            }
-            runCommand(commands);
+
+            commands.add("-async");
+            commands.add("1");
+            //commands.add("-c");
+            //commands.add("copy");
+            commands.add(fileFolder + File.separator + fileName[0] + "_part" + i + "." + fileName[1]);
+            commands.add("-y");
+            cutedVideoPaths.add(fileFolder + File.separator + fileName[0] + "_part" + i + "." + fileName[1]);
+        }
+        runCommand(commands);
 
         return cutedVideoPaths;
     }
