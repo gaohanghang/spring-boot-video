@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import project.util.FfmpegDevideVideo;
 import project.util.FileUtil;
@@ -29,8 +31,8 @@ public class SectionController {
     @Value("${file.save.path}")
     private String fileSavePath;
 
-    @RequestMapping("/section")
-    public void section(String filePath, int eachPartTime, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @GetMapping("/section")
+    public void section(@RequestParam("文件路径") String filePath, @RequestParam("时长（单位秒）") int eachPartTime, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String videoTime = FfmpegDevideVideo.getVideoTime(new File(filePath));
         if (StringUtils.isEmpty(eachPartTime)) {
             eachPartTime = 140;
